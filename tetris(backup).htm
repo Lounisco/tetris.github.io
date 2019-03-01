@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <script type="text/javascript">
+        var alle_elemente = [];
+        var stille_elemente = [];
+        var score = 0;
+        var links = false;
+        var rechts = false;
+        var pause = false;
+        var myScore;
+
+
+        document.onkeydown = function (e) {
+            if (e.keyCode == 65) {
+                links = true;
+            } else if (e.keyCode == 68) {
+                rechts = true;
+            }
+            if (pause) {
+                return;
+            }
+            var Spielfeld = document.getElementById('Spielfeld');
+            if (links && (parseObjekt(alle_elemente[0]).left > parseSpielfeld(Spielfeld).left)) {
+                var kollidiert = false;
+                for (var k = 0; k < stille_elemente.length; k++) {
+
+                    if (checkeKollisionLinks(alle_elemente[0], stille_elemente[k])) {
+                        kollidiert = true;
+
+                        break;
+                    }
+                }
+                if (!kollidiert) {
+                    alle_elemente[0].style.left = (parseInt(alle_elemente[0].style.left) - 100) + 'px';
+                }
+            } else if (rechts && (parseObjekt(alle_elemente[0]).right < parseSpielfeld(Spielfeld).right)) {
+                var kollidiert = false;
+                for (var k = 0; k < stille_elemente.length; k++) {
+
+                    if (checkeKollisionRechts(alle_elemente[0], stille_elemente[k])) {
+                        kollidiert = true;
+
+                        break;
+                    }
+                }
+                if (!kollidiert) {
+                    alle_elemente[0].style.left = (parseInt(alle_elemente[0].style.left) + 100) + 'px';
+                }
+            }
+        }
+
+        document.onkeyup = function (e) {
+            if (e.keyCode == 65) {
+                links = false;
+            } else if (e.keyCode == 68) {
+                rechts = false;
+            }
+        }
+
+        window.onload = function () {
+            alle_elemente.push(document.getElementById('MeinDiv'));
+            for (var i = 0; i < 120; i++) {
+                var element = document.createElement('div');
+                element.className = 'grid-item';
+                document.getElementById('Spielfeld').appendChild(element);
+            }
+        }
+
+        // function SagHallo() {
+        //     alert('Hallo Welt');
+        // }
+        // function SagHalloMitNamen(person) {
+        //     alert('Hallo ' + person);
+        // }
+        // SagHallo();
+        // SagHalloMitNamen('Tim, Tana, Anna, Joan und Henrik');
+
+        // function BewegDich() {
+        //     var mein_gefundenes_div = document.getElementById('MeinDiv');
+        //     var alter_top_wert = parseInt(mein_gefundenes_div.style.top);
+        //     mein_gefundenes_div.style.top = (alter_top_wert + 1) + 'px';
+        //     StarteTimeout()
+        // }
+
+        function parseObjekt(objekt) {
+            var werte = {
+                top: parseInt(objekt.style.top),
+                left: parseInt(objekt.style.left),
+                bottom: parseInt(objekt.style.top) + 100,
+                right: parseInt(objekt.style.left) + 100
+            }
+            return werte;
+        }
+
+        function checkeKollisionLinks(element1, element2) {
+            var ele1 = parseObjekt(element1)
+            var ele2 = parseObjekt(element2)
+            if (ele1.left == ele2.right && ele1.top == ele2.top) { return true; }
+            return false;
+        }
+
+        function checkeKollisionRechts(element1, element2) {
+            var ele1 = parseObjekt(element1)
+            var ele2 = parseObjekt(element2)
+            if (ele1.right == ele2.left && ele1.top == ele2.top) { return true; }
+            return false;
+        }
+
+        function checkeKollisionUnten(element1, element2) {
+            var ele1 = parseObjekt(element1)
+            var ele2 = parseObjekt(element2)
+            if (ele1.bottom == ele2.top && ele1.left == ele2.left) { return true; }
+            return false;
+        }
+
+        function StarteTimeout() {
+            window.setTimeout("BewegeAlleElemente();", 500);
+        }
+
+        function PausiereSpiel() {
+            pause = !pause;
+            document.getElementById('pause').value = pause ? "Fortsetzen" : "Pause";
+        }
+
+        function NeuesElement() {
+            var neues_element = document.createElement('div');
+            neues_element.style.position = 'absolute';
+            neues_element.style.top = '100px';
+            neues_element.style.left = '400px';
+            neues_element.style.width = '100px';
+            neues_element.style.height = '100px';
+            neues_element.style.backgroundColor = ZufallsFarben();
+            neues_element.style.border = '1px solid black';
+            document.body.appendChild(neues_element);
+            alle_elemente.push(neues_element);
+        }
+
+        function Zufall() {
+            var Spielfeld = document.getElementById('Spielfeld');
+            var position;
+            position = Math.floor(Math.random() * (parseSpielfeld(Spielfeld).width - 100)) + 11;
+            return position
+        }
+
+        function BewegeAlleElemente() {
+
+            if (pause) {
+                StarteTimeout();
+                return;
+            }
+            var anzahl_elemente = alle_elemente.length;
+
+
+            for (var i = 0; i < anzahl_elemente; i++) {
+                var Spielfeld = document.getElementById('Spielfeld');
+
+                if (parseObjekt(alle_elemente[i]).bottom < parseSpielfeld(Spielfeld).bottom) {
+                    var kollidiert = false;
+                    for (var k = 0; k < stille_elemente.length; k++) {
+
+                        if (checkeKollisionUnten(alle_elemente[i], stille_elemente[k])) {
+                            kollidiert = true;
+
+                            anzahl_elemente--;
+                            break;
+                        }
+                    }
+                    if (!kollidiert) {
+                        var mein_gefundenes_div = alle_elemente[i];
+                        var alter_top_wert = parseInt(mein_gefundenes_div.style.top);
+                        // Anzahl der px um die sich das Kästchen bewegt
+                        mein_gefundenes_div.style.top = (alter_top_wert + 100) + 'px';
+                    } else {
+                        if (parseObjekt(alle_elemente[i]).top == 100) {
+                            if (window.confirm('WAS KANNNNNST DUUUUU!!!!')) {
+                                window.location = 'game_over.htm'
+                                //Game Over Alert
+                            }
+                            else {
+                                console.log('test')
+                            }
+                        }
+                        else {
+                            stille_elemente.push(alle_elemente[i])
+                            alle_elemente.splice(alle_elemente[i], 1);
+                            document.getElementById("Punkte").value = stille_elemente.length;
+                            NeuesElement();
+                        }
+                    }
+                } else {
+                    stille_elemente.push(alle_elemente[i]);
+                    alle_elemente.splice(alle_elemente[i], 1);
+                    BloeckeAuslesen();
+                    anzahl_elemente--;
+                    NeuesElement()
+
+                }
+            }
+            StarteTimeout();
+        }
+
+        function parseSpielfeld(objekt) {
+            var werte = {
+                top: parseInt(objekt.style.top),
+                left: parseInt(objekt.style.left),
+                bottom: parseInt(objekt.style.top) + 1200,
+                right: parseInt(objekt.style.left) + 1000,
+                width: parseInt(objekt.style.width)
+            }
+
+            return werte;
+        }
+
+        function ZufallsFarben() {
+            // array mit farben definiert
+            var random_color = ["LimeGreen", "rgb(200, 0, 0)", "DodgerBlue", "Yellow"];
+            // zufällige zahl generiert - abhängig von der länge des arrays
+            var random_number = Math.floor(Math.random() * random_color.length);
+            // es wird eine farbe aus dem Array genommen abhängig von der random Zahl
+            return random_color[random_number];
+        }
+
+        function BloeckeAuslesen (){
+            var vorhandeneBloecke = [];
+            var vorhandeneIndexes = [];
+            var anzahl_untereReihe = 0;
+            for(var i = 0; i < 10; i++)
+            {
+                vorhandeneBloecke.push(undefined);
+                vorhandeneIndexes.push(-1);
+            }
+            
+            for(var k = 0; k < stille_elemente.length; k++)
+            {
+                var top_wert = parseObjekt(stille_elemente[k]).top;
+                var left_wert = parseObjekt(stille_elemente[k]).left;
+                if(top_wert == 1100)
+                {
+                    var index = (left_wert) / 100;
+                    vorhandeneBloecke[index] = stille_elemente[k];
+                    vorhandeneIndexes[index] = k;
+                    anzahl_untereReihe++;
+                }
+            }
+            if(anzahl_untereReihe == 10)
+            {
+                for(var z = 0; z < 10; z++)
+                {
+                document.body.removeChild(vorhandeneBloecke[z]);
+                
+                }
+                for(var z = 0; z < 10; z++)
+                {
+                stille_elemente.splice(vorhandeneIndexes[z], 1);
+                }
+                for(var k = 0; k < stille_elemente.length; k++) 
+                {
+                    stille_elemente[k].style.top = (parseObjekt(stille_elemente[k]).top + 100) +"px";
+                }
+            }
+
+
+            return vorhandeneBloecke;
+        }
+
+    </script>
+
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(10, 100px);
+            grid-template-rows: repeat(12, 100px);
+            background-color: rgb(4, 4, 184);
+        }
+
+        .grid-item {
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .myScore {
+            color: white;
+            font-size: 12px;
+            line-height: 12px;
+            padding: 4px;
+            border-radius: 0px;
+            font-family: 'Oswald', sans-serif;
+            font-weight: normal;
+            text-decoration: none;
+            font-style: normal;
+            font-variant: normal;
+            text-transform: none;
+            background-image: linear-gradient(to right, navy, dodgerblue, navy);
+            box-shadow: rgb(0, 0, 0) 5px 5px 15px 5px;
+            border: 2px solid lightskyblue;
+            display: inline-block;
+            margin-left: 1100px;
+            margin-top: 25px;
+            font-size: 150%;
+        }
+
+        .myButton {
+            height: 40px;
+        }
+
+        .myButton__Start {
+            margin-top: 25px;
+        }
+
+        .myButton__Pause {
+            margin-top: 15px;
+        }
+
+        .myButton:hover {
+            background: #1C6EA4;
+        }
+
+        .myButton:active {
+            background: #144E75;
+        }
+    </style>
+</head>
+
+<body
+    style="background-image: url('https://allianz-arena.com/binaries/content/gallery/allianz-arena/innenraum/webcam-neu.jpg'); background-size: cover;">
+    <br><br>
+    <input type="button" value="Start" onclick="StarteTimeout()" class="myScore myButton myButton__Start" />
+    <br><br>
+    <input type="button" value="Pause" onclick="PausiereSpiel()" id="pause" class="myScore myButton myButton__Pause" />
+    <br><br>
+    <input type="text" value="Score" class="myScore" id="Punkte" />
+    <p id="demo"></p>
+    <div id="MeinDiv"
+        style="position:absolute; top:100px; left:400px; width:100px; height:100px; background-color:rgb(200, 0, 0); border: 1px solid black">
+    </div>
+
+    <div class="grid-container" id="Spielfeld" style="position:absolute; left:0px; top:0px;
+            width:1000px; height:1200px;  z-index:-1">
+    </div>
+
+</body>
+
+</html>
