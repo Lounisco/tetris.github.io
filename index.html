@@ -237,9 +237,9 @@
             {
                 var top_wert = parseObjekt(stille_elemente[k]).top;
                 var left_wert = parseObjekt(stille_elemente[k]).left;
-                if(top_wert == 1100)
+                if(top_wert == 1200)
                 {
-                    var index = (left_wert) / 100;
+                    var index = (left_wert-100) / 100;
                     vorhandeneBloecke[index] = stille_elemente[k];
                     vorhandeneIndexes[index] = k;
                     anzahl_untereReihe++;
