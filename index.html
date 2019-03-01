@@ -245,22 +245,24 @@
                     anzahl_untereReihe++;
                 }
             }
-            if(anzahl_untereReihe == 10)
-            {
-                for(var z = 0; z < 10; z++)
-                {
-                document.body.removeChild(vorhandeneBloecke[z]);
-                
-                }
-                for(var z = 0; z < 10; z++)
-                {
-                stille_elemente.splice(vorhandeneIndexes[z], 1);
-                }
-                for(var k = 0; k < stille_elemente.length; k++) 
-                {
-                    stille_elemente[k].style.top = (parseObjekt(stille_elemente[k]).top + 100) +"px";
-                }
-            }
+             if(anzahl_untereReihe == 10)
+           {
+               for(var z = 0; z < 10; z++)
+               {
+                document.getElementById('Spielfeld').removeChild(vorhandeneBloecke[z]);
+
+               }
+               vorhandeneIndexes.sort((a,b) => {return a-b;});
+               for(var z = 9; z >= 0; z--)
+               {
+                    stille_elemente.splice(vorhandeneIndexes[z], 1);
+               }
+               for(var k = 0; k < stille_elemente.length; k++)
+               {
+                   stille_elemente[k].style.top = (parseObjekt(stille_elemente[k]).top + 100) +"px";
+               }
+           }
+
 
 
             return vorhandeneBloecke;
